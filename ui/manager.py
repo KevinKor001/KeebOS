@@ -3,7 +3,9 @@ import builtins
 import displayio
 import terminalio
 from adafruit_display_text import label
+from adafruit_display_shapes.Rect import Rect
 import i2cdisplaybus
+
 import adafruit_displayio_ssd1306
 from i2c_bus import i2c
 from ui import test, tty
@@ -37,13 +39,22 @@ root_container.append(modal_container)  # Modal renders on top of active window
 oled.root_group = root_container
 
 # --- Command Modal UI Elements ---
+modal_bg = Rect(1, 52, 126, 11, fill=0xFFFFFF, outline=0xFFFFFF)
+modal_container.append(modal_bg)
+
+
 modal_label = label.Label(
     terminalio.FONT,
-    text="> ",
-    color=0xFFFFFF,
+    text="$> ",
+    color=0x0000000,
     x=4,
-    y=54
+    y=57
 )
+
+
+
+
+
 modal_container.append(modal_label)
 modal_container.hidden = True
 

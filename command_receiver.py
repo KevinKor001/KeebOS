@@ -12,14 +12,6 @@ import layout_exporter
 import bind_tool
 from bind_tool import STATE_WAIT_KEY, STATE_WAIT_CODE
 
-# Physical GPIO Side-Buttons
-buttons = {
-    "up": digitalio.DigitalInOut(board.GP16),
-    "down": digitalio.DigitalInOut(board.GP17),
-    "hasthag": digitalio.DigitalInOut(board.GP18),
-    "star": digitalio.DigitalInOut(board.GP19),
-}
-
 # Simple keycode to ASCII conversion map
 KEY_MAP = {
     KC.A: "a", KC.B: "b", KC.C: "c", KC.D: "d", KC.E: "e", KC.F: "f",
@@ -33,21 +25,19 @@ KEY_MAP = {
 
 
 
-for button in buttons.values():
-    button.direction = digitalio.Direction.INPUT
-    button.pull = digitalio.Pull.UP
+
 
 
 class CommandReceiver(Extension):
     def during_bootup(self, keyboard):
         # Guarantee state variables exist on KMK boot
         self.keyboard = keyboard
-        self.last_state = {name: True for name in buttons}
+
         self.input_buffer = ""
         self.modal_active = False
         self.handled_keys = set()
 
-        ui.show("main")
+        ui.manager.show("main")
 
     def after_matrix_scan(self, sandbox): pass
     def after_hid_send(self, sandbox): pass
@@ -66,14 +56,6 @@ class CommandReceiver(Extension):
                 self.input_buffer = ""
             else:
                 self.input_buffer += char
-
-        # Side Button Checks
-        if hasattr(self, 'last_state'):
-            for name, pin in buttons.items():
-                current_btn = pin.value
-                if not current_btn and self.last_state[name]: 
-                    print(f'\nBUTTON: {name} pressed!')
-                self.last_state[name] = current_btn
 
     def before_hid_send(self, sandbox):
         if not getattr(self, 'keyboard', None) or not hasattr(self.keyboard, 'keys_pressed'):
@@ -156,8 +138,8 @@ class CommandReceiver(Extension):
         self.input_buffer = ""
         print("cleared, Showing overlay")
         # Ensure main screen is loaded if oled.root_group is empty
-        if ui.oled.root_group is None:
-            ui.show("main")
+        #if ui.oled.root_group is None:
+        #    ui.show("main")
 
         if self.modal_active:
             ui.manager.show_cmd_modal()
